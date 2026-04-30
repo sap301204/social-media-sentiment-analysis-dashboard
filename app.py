@@ -5,15 +5,18 @@ import random
 from datetime import datetime, timedelta
 
 st.set_page_config(
-    page_title="McDonald's BI Dashboard",
-    page_icon="🍟",
+    page_title="McDonald's Dashboard",
+    page_icon="M",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# =========================
+# CSS
+# =========================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
@@ -24,74 +27,107 @@ html, body, [class*="css"] {
     color: #ffffff;
 }
 
+/* =======================
+   SIDEBAR
+======================= */
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #03131a 0%, #02070d 100%);
-    border-right: 1px solid #00eaff55;
+    border-right: 1px solid #00eaff33;
+    min-width: 320px !important;
+    max-width: 320px !important;
 }
 
-/* SIDEBAR APP STYLE */
-.sidebar-brand {
-    padding: 20px 10px 20px 10px;
+.brand-block {
+    padding: 10px 8px 18px 8px;
 }
 
-.sidebar-logo {
+.brand-title {
+    color: #00f5ff;
     font-size: 26px;
     font-weight: 900;
-    color: #00f5ff;
+    letter-spacing: 0.2px;
+    margin-bottom: 6px;
 }
 
-.sidebar-role {
-    color: #8ff6ff;
-    font-size: 12px;
-    margin-top: 4px;
+.brand-line {
+    height: 1px;
+    background: linear-gradient(90deg, #00eaff66, transparent);
+    margin-top: 18px;
+    margin-bottom: 14px;
 }
 
-div[role="radiogroup"] label {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    margin-bottom: 10px !important;
+/* NAVIGATION */
+section[data-testid="stSidebar"] div[role="radiogroup"] {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 6px;
+    margin-bottom: 24px;
 }
 
-div[role="radiogroup"] label > div:first-child {
+section[data-testid="stSidebar"] div[role="radiogroup"] label {
+    background: #071923 !important;
+    border: 1px solid #00eaff55 !important;
+    border-radius: 18px !important;
+    padding: 14px 16px !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+    box-shadow: 0 0 16px rgba(0,245,255,0.04);
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+    background: #0a2230 !important;
+    transform: translateX(3px);
+    box-shadow: 0 0 18px rgba(0,245,255,0.10);
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child {
     display: none !important;
 }
 
-div[role="radiogroup"] label p {
-    background: #071923;
-    border: 1px solid #00eaff33;
-    border-radius: 14px;
-    padding: 15px 18px;
-    color: white !important;
-    font-size: 16px;
-    font-weight: 800;
-    transition: 0.25s ease;
+section[data-testid="stSidebar"] div[role="radiogroup"] label p {
+    color: #ffffff !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
 }
 
-div[role="radiogroup"] label p:hover {
-    background: #092b38;
-    border-left: 5px solid #7c3aed;
+section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(90deg, #0a2230, #071923) !important;
+    border: 1px solid #00f5ff !important;
+    box-shadow: 0 0 18px rgba(0,245,255,0.14);
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p {
     color: #00f5ff !important;
-    transform: translateX(4px);
 }
 
-.sidebar-divider {
-    border-top: 1px solid #00eaff33;
-    margin: 24px 0 18px 0;
+.nav-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #ffffff, #d7d7d7);
+    margin-right: 6px;
 }
 
-/* FILTER PANEL STYLE */
+/* FILTER PANEL */
 .filter-panel {
     background: #071923;
     border: 1px solid #00eaff55;
-    border-radius: 18px;
+    border-radius: 22px;
     padding: 22px 18px;
-    margin-bottom: 22px;
+    margin-top: 10px;
+    margin-bottom: 18px;
     box-shadow: 0 0 22px rgba(0,245,255,0.08);
 }
 
 .filter-title {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 900;
     color: #00f5ff;
     margin-bottom: 18px;
@@ -100,10 +136,10 @@ div[role="radiogroup"] label p:hover {
 .search-box {
     background: #020b10;
     border: 1px solid #00eaff33;
-    border-radius: 10px;
-    padding: 11px 13px;
+    border-radius: 14px;
+    padding: 13px 14px;
     color: #7ddcff;
-    font-size: 14px;
+    font-size: 15px;
     margin-bottom: 18px;
 }
 
@@ -111,7 +147,7 @@ div[role="radiogroup"] label p:hover {
     color: #ffffff;
     font-size: 15px;
     font-weight: 650;
-    padding: 11px 8px;
+    padding: 10px 8px;
     border-radius: 10px;
     margin-bottom: 4px;
 }
@@ -127,22 +163,45 @@ div[role="radiogroup"] label p:hover {
     margin: 18px 0;
 }
 
-.collapse-text {
-    color: #7ddcff;
-    font-weight: 700;
-    margin-top: 18px;
-    font-size: 14px;
+.sidebar-subhead {
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+    margin-top: 10px;
+    margin-bottom: 12px;
+}
+
+/* STREAMLIT MULTISELECT */
+section[data-testid="stSidebar"] .stMultiSelect label {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+}
+
+section[data-testid="stSidebar"] .stMultiSelect [data-baseweb="select"] > div {
+    background: #0a0f18 !important;
+    border: 1px solid #1b2430 !important;
+    border-radius: 14px !important;
+    min-height: 52px !important;
+}
+
+section[data-testid="stSidebar"] .stMultiSelect span {
+    color: white !important;
 }
 
 section[data-testid="stSidebar"] .stButton > button {
     width: 100%;
     background: linear-gradient(90deg, #00f5ff, #00ff88);
     color: #001014;
-    border-radius: 10px;
+    border-radius: 14px;
     font-weight: 900;
+    font-size: 16px;
+    border: none;
+    padding: 12px 18px;
+    margin-top: 10px;
 }
 
-/* MAIN */
+/* MAIN CONTENT */
 .main-card {
     background: linear-gradient(135deg, #061923, #030b12);
     border: 1px solid #00eaff55;
@@ -264,6 +323,10 @@ textarea {
 </style>
 """, unsafe_allow_html=True)
 
+
+# =========================
+# DATA LOADER
+# =========================
 @st.cache_data
 def load_data():
     possible_files = [
@@ -282,7 +345,7 @@ def load_data():
             continue
 
     if df is None:
-        st.error("CSV file not found. Upload McDonald_s_Reviews.csv to GitHub root folder.")
+        st.error("CSV file not found. Upload your McDonald's reviews CSV in the project folder.")
         st.stop()
 
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
@@ -291,7 +354,7 @@ def load_data():
     text_col = next((col for col in text_candidates if col in df.columns), None)
 
     if text_col is None:
-        st.error("No review/text column found.")
+        st.error("No review/text column found in dataset.")
         st.stop()
 
     df["text"] = df[text_col].astype(str)
@@ -358,32 +421,33 @@ def load_data():
 
 df = load_data()
 
-# ---------------- SIDEBAR ----------------
+
+# =========================
+# SIDEBAR
+# =========================
 st.sidebar.markdown("""
-<div class="sidebar-brand">
-    <div class="sidebar-logo">🍟 McDonald’s BI</div>
-    <div class="sidebar-role">Product Intelligence Dashboard</div>
+<div class="brand-block">
+    <div class="brand-title">McDonald’s Pulse</div>
+    <div class="brand-line"></div>
 </div>
 """, unsafe_allow_html=True)
 
 page = st.sidebar.radio(
     "Navigation",
     [
-        "▌ 📊 Overview",
-        "▌ 💬 Mentions",
-        "▌ 📈 Trends",
-        "▌ 🌍 Platforms",
-        "▌ 🔍 Analyzer"
+        "Overview",
+        "Mentions",
+        "Trends",
+        "Platforms",
+        "Analyzer"
     ],
     label_visibility="collapsed"
 )
 
-st.sidebar.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-
 st.sidebar.markdown("""
 <div class="filter-panel">
-    <div class="filter-title">⚙️ Filter data</div>
-    <div class="search-box">🔍 &nbsp; Search</div>
+    <div class="filter-title">Filter data</div>
+    <div class="search-box">Search</div>
 
     <div class="filter-menu-item">CPS</div>
     <div class="filter-menu-item">Questions</div>
@@ -394,13 +458,13 @@ st.sidebar.markdown("""
 
     <hr class="filter-line">
 
-    <div class="filter-menu-item">📊 &nbsp; Comparison</div>
-    <div class="filter-menu-item">🧩 &nbsp; Segment data</div>
-    <div class="filter-menu-item">🕘 &nbsp; Saved filters</div>
+    <div class="filter-menu-item">Comparison</div>
+    <div class="filter-menu-item">Segment data</div>
+    <div class="filter-menu-item">Saved filters</div>
 </div>
 """, unsafe_allow_html=True)
 
-st.sidebar.markdown("### 🎯 Active Filters")
+st.sidebar.markdown('<div class="sidebar-subhead">Filters</div>', unsafe_allow_html=True)
 
 sentiment_filter = st.sidebar.multiselect(
     "Sentiment",
@@ -422,17 +486,16 @@ category_filter = st.sidebar.multiselect(
 
 st.sidebar.button("Apply filter")
 
-st.sidebar.markdown(
-    '<div class="collapse-text">‹ Collapse panel</div>',
-    unsafe_allow_html=True
-)
-
 df_filtered = df[
     (df["sentiment"].isin(sentiment_filter)) &
     (df["platform"].isin(platform_filter)) &
     (df["category"].isin(category_filter))
 ]
 
+
+# =========================
+# HELPERS
+# =========================
 def style_chart(fig):
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
@@ -447,14 +510,6 @@ def style_chart(fig):
     fig.update_yaxes(gridcolor="#12313d", zerolinecolor="#12313d")
     return fig
 
-st.markdown("""
-<div class="main-card">
-    <div class="title">McDonald’s Social Media Sentiment Intelligence</div>
-    <div class="subtitle">
-        Premium analytics for customer sentiment, brand health, platform activity and McDonald’s review intelligence.
-    </div>
-</div>
-""", unsafe_allow_html=True)
 
 def render_kpis(data):
     total = len(data)
@@ -484,19 +539,35 @@ def render_kpis(data):
             </div>
             """, unsafe_allow_html=True)
 
-# ---------------- PAGES ----------------
-if page == "▌ 📊 Overview":
+
+# =========================
+# HEADER
+# =========================
+st.markdown("""
+<div class="main-card">
+    <div class="title">McDonald’s Social Media Sentiment Intelligence</div>
+    <div class="subtitle">
+        Premium analytics for customer sentiment, platform activity, engagement tracking, and brand health.
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# =========================
+# PAGES
+# =========================
+if page == "Overview":
     render_kpis(df_filtered)
     st.write("")
 
-    c1, c2 = st.columns([1, 1])
+    c1, c2 = st.columns(2)
 
     with c1:
         st.markdown('<div class="panel">', unsafe_allow_html=True)
         fig = px.pie(
             df_filtered,
             names="sentiment",
-            title="Sentiment Health Ring",
+            title="Sentiment Share",
             hole=0.65,
             color="sentiment",
             color_discrete_map={
@@ -517,7 +588,8 @@ if page == "▌ 📊 Overview":
             x="category",
             y="mentions",
             color="sentiment",
-            title="Category-wise Sentiment Breakdown",
+            title="Category-wise Sentiment",
+            barmode="group",
             color_discrete_map={
                 "positive": "#00ff88",
                 "neutral": "#00f5ff",
@@ -527,7 +599,7 @@ if page == "▌ 📊 Overview":
         st.plotly_chart(style_chart(fig), use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-elif page == "▌ 💬 Mentions":
+elif page == "Mentions":
     st.markdown('<div class="section-title">Recent Customer Mentions</div>', unsafe_allow_html=True)
 
     top_mentions = df_filtered.sort_values("date", ascending=False).head(18)
@@ -548,13 +620,13 @@ elif page == "▌ 💬 Mentions":
         </div>
         """, unsafe_allow_html=True)
 
-elif page == "▌ 📈 Trends":
-    c1, c2 = st.columns(2)
-
+elif page == "Trends":
     trend = df_filtered.groupby(df_filtered["date"].dt.date).agg(
         average_sentiment=("score", "mean"),
         engagement=("engagement", "sum")
     ).reset_index()
+
+    c1, c2 = st.columns(2)
 
     with c1:
         st.markdown('<div class="panel">', unsafe_allow_html=True)
@@ -562,7 +634,7 @@ elif page == "▌ 📈 Trends":
             trend,
             x="date",
             y="average_sentiment",
-            title="Sentiment Score Trend",
+            title="Sentiment Trend Over Time",
             markers=True
         )
         fig.update_traces(line_color="#00ff88", line_width=3)
@@ -578,11 +650,11 @@ elif page == "▌ 📈 Trends":
             title="Engagement Trend",
             markers=True
         )
-        fig.update_traces(line_color="#00f5ff", fillcolor="rgba(0,245,255,0.28)")
+        fig.update_traces(line_color="#00f5ff", fillcolor="rgba(0,245,255,0.22)")
         st.plotly_chart(style_chart(fig), use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-elif page == "▌ 🌍 Platforms":
+elif page == "Platforms":
     platform_data = df_filtered.groupby("platform").agg(
         mentions=("text", "count"),
         engagement=("engagement", "sum"),
@@ -612,13 +684,13 @@ elif page == "▌ 🌍 Platforms":
             y="engagement",
             size="mentions",
             color="platform",
-            title="Reach vs Engagement by Platform",
+            title="Reach vs Engagement",
             size_max=55
         )
         st.plotly_chart(style_chart(fig), use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-elif page == "▌ 🔍 Analyzer":
+elif page == "Analyzer":
     left, right = st.columns([1.2, 1])
 
     with left:
@@ -643,11 +715,11 @@ elif page == "▌ 🔍 Analyzer":
                 neg_hits = sum(w in text for w in negative_words)
 
                 if pos_hits > neg_hits:
-                    st.success("😊 Positive Sentiment Detected")
+                    st.success("Positive sentiment detected")
                 elif neg_hits > pos_hits:
-                    st.error("😡 Negative Sentiment Detected")
+                    st.error("Negative sentiment detected")
                 else:
-                    st.warning("😐 Neutral Sentiment Detected")
+                    st.warning("Neutral sentiment detected")
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -659,9 +731,9 @@ elif page == "▌ 🔍 Analyzer":
         neg_rate = round((negative / total) * 100, 1) if total else 0
 
         st.markdown('<div class="panel">', unsafe_allow_html=True)
-        st.markdown('<div class="section-title">AI Business Insight Board</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="insight">✅ Top issue/category: <b>{top_category}</b></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="insight">📡 Most active platform: <b>{top_platform}</b></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="insight">⚠️ Negative feedback rate: <b>{neg_rate}%</b></div>', unsafe_allow_html=True)
-        st.markdown('<div class="insight">📌 Recommended action: Track service speed, food quality, and pricing complaints.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">AI Business Insights</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="insight">Top issue/category: <b>{top_category}</b></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="insight">Most active platform: <b>{top_platform}</b></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="insight">Negative feedback rate: <b>{neg_rate}%</b></div>', unsafe_allow_html=True)
+        st.markdown('<div class="insight">Recommended action: monitor service speed, pricing issues, and food quality complaints.</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
