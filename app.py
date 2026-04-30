@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 st.set_page_config(
     page_title="McDonald's Dashboard",
-    page_icon="M",
+    page_icon="🍔",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -33,36 +33,60 @@ html, body, [class*="css"] {
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #03131a 0%, #02070d 100%);
     border-right: 1px solid #00eaff33;
-    min-width: 320px !important;
-    max-width: 320px !important;
 }
 
 .brand-block {
-    padding: 10px 8px 18px 8px;
+    padding: 12px 8px 22px 8px;
+}
+
+.brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.burger-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #00f5ff, #00ff88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+    box-shadow: 0 0 22px rgba(0,245,255,0.28);
 }
 
 .brand-title {
     color: #00f5ff;
-    font-size: 26px;
+    font-size: 25px;
     font-weight: 900;
     letter-spacing: 0.2px;
-    margin-bottom: 6px;
+    line-height: 1.1;
+}
+
+.brand-subtitle {
+    color: #8ff6ff;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 8px;
+    margin-left: 54px;
 }
 
 .brand-line {
     height: 1px;
     background: linear-gradient(90deg, #00eaff66, transparent);
-    margin-top: 18px;
-    margin-bottom: 14px;
+    margin-top: 22px;
+    margin-bottom: 16px;
 }
 
 /* NAVIGATION */
 section[data-testid="stSidebar"] div[role="radiogroup"] {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 13px;
     margin-top: 6px;
-    margin-bottom: 24px;
+    margin-bottom: 26px;
 }
 
 section[data-testid="stSidebar"] div[role="radiogroup"] label {
@@ -91,14 +115,14 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label p {
     font-size: 17px !important;
     font-weight: 800 !important;
     margin: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
 }
 
 section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
     background: linear-gradient(90deg, #0a2230, #071923) !important;
-    border: 1px solid #00f5ff !important;
+    border-left: 5px solid #00f5ff !important;
+    border-top: 1px solid #00f5ff !important;
+    border-right: 1px solid #00f5ff !important;
+    border-bottom: 1px solid #00f5ff !important;
     box-shadow: 0 0 18px rgba(0,245,255,0.14);
 }
 
@@ -106,90 +130,53 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked)
     color: #00f5ff !important;
 }
 
-.nav-icon {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    background: linear-gradient(180deg, #ffffff, #d7d7d7);
-    margin-right: 6px;
-}
-
-/* FILTER PANEL */
-.filter-panel {
-    background: #071923;
-    border: 1px solid #00eaff55;
-    border-radius: 22px;
-    padding: 22px 18px;
-    margin-top: 10px;
-    margin-bottom: 18px;
-    box-shadow: 0 0 22px rgba(0,245,255,0.08);
-}
-
-.filter-title {
-    font-size: 20px;
-    font-weight: 900;
-    color: #00f5ff;
-    margin-bottom: 18px;
-}
-
-.search-box {
-    background: #020b10;
-    border: 1px solid #00eaff33;
-    border-radius: 14px;
-    padding: 13px 14px;
-    color: #7ddcff;
-    font-size: 15px;
-    margin-bottom: 18px;
-}
-
-.filter-menu-item {
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 650;
-    padding: 10px 8px;
-    border-radius: 10px;
-    margin-bottom: 4px;
-}
-
-.filter-menu-item:hover {
-    background: #092b38;
-    color: #00f5ff;
-}
-
-.filter-line {
-    border: none;
-    border-top: 1px solid #00eaff33;
-    margin: 18px 0;
-}
-
+/* FILTERS */
 .sidebar-subhead {
     color: white;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 900;
-    margin-top: 10px;
-    margin-bottom: 12px;
+    margin-top: 12px;
+    margin-bottom: 18px;
 }
 
-/* STREAMLIT MULTISELECT */
 section[data-testid="stSidebar"] .stMultiSelect label {
     color: #ffffff !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     font-size: 15px !important;
 }
 
 section[data-testid="stSidebar"] .stMultiSelect [data-baseweb="select"] > div {
-    background: #0a0f18 !important;
-    border: 1px solid #1b2430 !important;
-    border-radius: 14px !important;
+    background: #08111c !important;
+    border: 1px solid #00eaff33 !important;
+    border-radius: 16px !important;
     min-height: 52px !important;
 }
 
+/* selected filter chips */
+section[data-testid="stSidebar"] [data-baseweb="tag"] {
+    background: linear-gradient(90deg, #00f5ff, #00ff88) !important;
+    color: #001014 !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+}
+
+section[data-testid="stSidebar"] [data-baseweb="tag"] span {
+    color: #001014 !important;
+    font-weight: 800 !important;
+}
+
+section[data-testid="stSidebar"] [data-baseweb="tag"] svg {
+    color: #001014 !important;
+}
+
+/* dropdown text */
 section[data-testid="stSidebar"] .stMultiSelect span {
     color: white !important;
 }
 
-section[data-testid="stSidebar"] .stButton > button {
+/* apply button */
+section[data-testid="stSidebar"] .stButton > button,
+section[data-testid="stSidebar"] .stFormSubmitButton > button {
     width: 100%;
     background: linear-gradient(90deg, #00f5ff, #00ff88);
     color: #001014;
@@ -197,8 +184,14 @@ section[data-testid="stSidebar"] .stButton > button {
     font-weight: 900;
     font-size: 16px;
     border: none;
-    padding: 12px 18px;
-    margin-top: 10px;
+    padding: 13px 18px;
+    margin-top: 12px;
+}
+
+section[data-testid="stSidebar"] .stButton > button:hover,
+section[data-testid="stSidebar"] .stFormSubmitButton > button:hover {
+    box-shadow: 0 0 25px rgba(0,245,255,0.30);
+    transform: translateY(-1px);
 }
 
 /* MAIN CONTENT */
@@ -423,15 +416,22 @@ df = load_data()
 
 
 # =========================
-# SIDEBAR
+# SIDEBAR BRAND
 # =========================
 st.sidebar.markdown("""
 <div class="brand-block">
-    <div class="brand-title">McDonald’s Pulse</div>
+    <div class="brand-row">
+        <div class="burger-icon">🍔</div>
+        <div class="brand-title">McDonald’s Pulse</div>
+    </div>
+    <div class="brand-subtitle">Product Intelligence Dashboard</div>
     <div class="brand-line"></div>
 </div>
 """, unsafe_allow_html=True)
 
+# =========================
+# SIDEBAR NAVIGATION
+# =========================
 page = st.sidebar.radio(
     "Navigation",
     [
@@ -444,52 +444,50 @@ page = st.sidebar.radio(
     label_visibility="collapsed"
 )
 
-st.sidebar.markdown("""
-<div class="filter-panel">
-    <div class="filter-title">Filter data</div>
-    <div class="search-box">Search</div>
-
-    <div class="filter-menu-item">CPS</div>
-    <div class="filter-menu-item">Questions</div>
-    <div class="filter-menu-item">Survey</div>
-    <div class="filter-menu-item">Time</div>
-    <div class="filter-menu-item">Language</div>
-    <div class="filter-menu-item">Custom</div>
-
-    <hr class="filter-line">
-
-    <div class="filter-menu-item">Comparison</div>
-    <div class="filter-menu-item">Segment data</div>
-    <div class="filter-menu-item">Saved filters</div>
-</div>
-""", unsafe_allow_html=True)
-
+# =========================
+# SIDEBAR FILTERS WITH APPLY BUTTON
+# =========================
 st.sidebar.markdown('<div class="sidebar-subhead">Filters</div>', unsafe_allow_html=True)
 
-sentiment_filter = st.sidebar.multiselect(
-    "Sentiment",
-    sorted(df["sentiment"].unique()),
-    default=sorted(df["sentiment"].unique())
-)
+if "sentiment_filter" not in st.session_state:
+    st.session_state.sentiment_filter = sorted(df["sentiment"].unique())
 
-platform_filter = st.sidebar.multiselect(
-    "Platform",
-    sorted(df["platform"].unique()),
-    default=sorted(df["platform"].unique())
-)
+if "platform_filter" not in st.session_state:
+    st.session_state.platform_filter = sorted(df["platform"].unique())
 
-category_filter = st.sidebar.multiselect(
-    "Category",
-    sorted(df["category"].unique()),
-    default=sorted(df["category"].unique())
-)
+if "category_filter" not in st.session_state:
+    st.session_state.category_filter = sorted(df["category"].unique())
 
-st.sidebar.button("Apply filter")
+with st.sidebar.form("filter_form"):
+    temp_sentiment = st.multiselect(
+        "Sentiment",
+        sorted(df["sentiment"].unique()),
+        default=st.session_state.sentiment_filter
+    )
+
+    temp_platform = st.multiselect(
+        "Platform",
+        sorted(df["platform"].unique()),
+        default=st.session_state.platform_filter
+    )
+
+    temp_category = st.multiselect(
+        "Category",
+        sorted(df["category"].unique()),
+        default=st.session_state.category_filter
+    )
+
+    apply_filter = st.form_submit_button("Apply filter")
+
+if apply_filter:
+    st.session_state.sentiment_filter = temp_sentiment
+    st.session_state.platform_filter = temp_platform
+    st.session_state.category_filter = temp_category
 
 df_filtered = df[
-    (df["sentiment"].isin(sentiment_filter)) &
-    (df["platform"].isin(platform_filter)) &
-    (df["category"].isin(category_filter))
+    (df["sentiment"].isin(st.session_state.sentiment_filter)) &
+    (df["platform"].isin(st.session_state.platform_filter)) &
+    (df["category"].isin(st.session_state.category_filter))
 ]
 
 
