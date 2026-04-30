@@ -86,7 +86,7 @@ section[data-testid="stSidebar"] div[role="radiogroup"] {
     flex-direction: column;
     gap: 13px;
     margin-top: 6px;
-    margin-bottom: 26px;
+    margin-bottom: 8px;
 }
 
 section[data-testid="stSidebar"] div[role="radiogroup"] label {
@@ -135,8 +135,8 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked)
     color: white;
     font-size: 22px;
     font-weight: 900;
-    margin-top: 12px;
-    margin-bottom: 18px;
+    margin-top: 4px;
+    margin-bottom: 14px;
 }
 
 section[data-testid="stSidebar"] .stMultiSelect label {
