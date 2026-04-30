@@ -2,17 +2,17 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import random
-import re
 from datetime import datetime, timedelta
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
-    page_title="McDonald's Social Listening Dashboard",
+    page_title="McDonald's BI Dashboard",
     page_icon="🍟",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# ---------------- CSS: POWER BI / NEON DASHBOARD ----------------
+# ---------------- CSS ----------------
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
@@ -22,120 +22,158 @@ html, body, [class*="css"] {
 }
 
 .stApp {
-    background: #050b14;
+    background: radial-gradient(circle at top left, #06222d 0%, #020812 45%, #010409 100%);
     color: #ffffff;
 }
 
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #061018 0%, #071b22 100%);
-    border-right: 1px solid #00f5ff55;
+    background: linear-gradient(180deg, #03131a 0%, #02070d 100%);
+    border-right: 1px solid #00eaff55;
 }
 
-.sidebar-title {
-    font-size: 25px;
+.sidebar-logo {
+    font-size: 28px;
     font-weight: 900;
     color: #00f5ff;
-    margin-bottom: 10px;
+    margin-bottom: 25px;
 }
 
-.nav-box {
+div[role="radiogroup"] label {
     background: #071923;
-    border: 1px solid #00f5ff55;
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 10px;
-    color: white;
-    font-weight: 700;
+    border: 1px solid #00eaff55;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    width: 100%;
+    transition: 0.2s;
 }
 
-.main-header {
-    background: linear-gradient(90deg, #061018, #071b22);
-    border: 1px solid #00f5ff55;
-    border-radius: 18px;
-    padding: 22px 26px;
-    margin-bottom: 20px;
-    box-shadow: 0 0 25px rgba(0,245,255,0.12);
+div[role="radiogroup"] label:hover {
+    background: #092b38;
+    border: 1px solid #00f5ff;
+}
+
+.main-card {
+    background: linear-gradient(135deg, #061923, #030b12);
+    border: 1px solid #00eaff55;
+    border-radius: 22px;
+    padding: 26px;
+    margin-bottom: 24px;
+    box-shadow: 0 0 28px rgba(0,245,255,0.10);
 }
 
 .title {
-    font-size: 34px;
+    font-size: 36px;
     font-weight: 900;
     color: #00f5ff;
-    letter-spacing: 0.5px;
 }
 
 .subtitle {
-    color: #a7f3ff;
     font-size: 15px;
-    margin-top: 6px;
-}
-
-.kpi-card {
-    background: linear-gradient(180deg, #071923 0%, #041018 100%);
-    border: 1px solid #00f5ff66;
-    border-radius: 16px;
-    padding: 18px;
-    box-shadow: 0 0 18px rgba(0,245,255,0.10);
-}
-
-.kpi-label {
-    font-size: 13px;
-    color: #9defff;
-    font-weight: 700;
-}
-
-.kpi-value {
-    font-size: 32px;
-    color: white;
-    font-weight: 900;
+    color: #b8f7ff;
     margin-top: 8px;
 }
 
-.kpi-delta {
+.kpi {
+    background: linear-gradient(180deg, #071923, #020b10);
+    border: 1px solid #00eaff66;
+    border-radius: 18px;
+    padding: 20px;
+    min-height: 135px;
+    box-shadow: 0 0 22px rgba(0,245,255,0.08);
+}
+
+.kpi-label {
+    color: #8ff6ff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.kpi-value {
+    color: white;
+    font-size: 32px;
+    font-weight: 900;
+    margin-top: 10px;
+}
+
+.kpi-note {
     color: #00ff88;
     font-size: 13px;
     font-weight: 700;
+    margin-top: 8px;
 }
 
 .panel {
-    background: #07111d;
-    border: 1px solid #00f5ff55;
-    border-radius: 16px;
-    padding: 18px;
-    box-shadow: 0 0 20px rgba(0,245,255,0.08);
-    margin-bottom: 16px;
+    background: #06111d;
+    border: 1px solid #00eaff44;
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 0 24px rgba(0,245,255,0.08);
 }
 
 .section-title {
-    color: #00f5ff;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 900;
+    color: #00f5ff;
+    margin-bottom: 16px;
+}
+
+.mention-card {
+    background: linear-gradient(90deg, #071923, #041018);
+    border-left: 5px solid #00f5ff;
+    border-radius: 14px;
+    padding: 16px;
     margin-bottom: 12px;
 }
 
-.insight-box {
-    background: #061923;
-    border-left: 5px solid #00f5ff;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 10px;
-    color: #dffcff;
+.mention-text {
+    font-size: 15px;
+    color: white;
+    font-weight: 600;
+}
+
+.mention-meta {
+    font-size: 12px;
+    color: #a7f3ff;
+    margin-top: 8px;
+}
+
+.insight {
+    background: #061e29;
+    border-left: 5px solid #00ffcc;
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+    color: white;
+    font-weight: 650;
+}
+
+.analyzer-box {
+    background: linear-gradient(135deg, #081b24, #030b12);
+    border: 1px solid #00eaff66;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 0 35px rgba(0,245,255,0.12);
 }
 
 .stButton > button {
     background: linear-gradient(90deg, #00f5ff, #00ff88);
     color: #001014;
     border: none;
-    border-radius: 10px;
-    padding: 12px 26px;
+    border-radius: 14px;
+    padding: 14px 34px;
     font-weight: 900;
+    font-size: 16px;
 }
 
-div[data-testid="stMetric"] {
-    background: #071923;
-    border: 1px solid #00f5ff44;
-    padding: 15px;
-    border-radius: 14px;
+textarea {
+    border-radius: 18px !important;
+}
+
+hr {
+    border-color: #00eaff33;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -155,7 +193,7 @@ def load_data():
         try:
             df = pd.read_csv(file, encoding="latin1")
             break
-        except:
+        except Exception:
             continue
 
     if df is None:
@@ -164,117 +202,111 @@ def load_data():
 
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-    # Detect review text column
     text_candidates = ["review", "text", "review_text", "comment", "reviews"]
     text_col = next((col for col in text_candidates if col in df.columns), None)
 
     if text_col is None:
-        st.error("No review/text column found. Your CSV must contain a review or text column.")
+        st.error("No review/text column found.")
         st.stop()
 
     df["text"] = df[text_col].astype(str)
 
-    # Detect rating column
     rating_candidates = ["rating", "stars", "score"]
     rating_col = next((col for col in rating_candidates if col in df.columns), None)
 
     if rating_col:
         df["rating_clean"] = df[rating_col].astype(str).str.extract(r"(\d+)").astype(float)
+        df["rating_clean"] = df["rating_clean"].fillna(3)
     else:
         df["rating_clean"] = random.choices([1, 2, 3, 4, 5], k=len(df))
 
-    def rating_to_sentiment(rating):
-        if rating >= 4:
+    def rating_to_sentiment(r):
+        if r >= 4:
             return "positive"
-        elif rating == 3:
+        elif r == 3:
             return "neutral"
-        else:
-            return "negative"
+        return "negative"
 
     df["sentiment"] = df["rating_clean"].apply(rating_to_sentiment)
     df["score"] = df["sentiment"].map({"positive": 1, "neutral": 0, "negative": -1})
 
-    # Add realistic industry-style dashboard fields
     platforms = ["Google Reviews", "Twitter/X", "Instagram", "Facebook", "YouTube", "Reddit"]
-    categories = ["Food Quality", "Service", "Price", "Cleanliness", "Delivery", "Waiting Time", "App Experience"]
-    campaigns = ["McFlurry Buzz", "Burger Promo", "Fries Campaign", "Breakfast Offer", "General Brand Talk"]
     locations = ["New York", "California", "Texas", "Florida", "Chicago", "Ohio", "Arizona"]
+    campaigns = ["McFlurry Buzz", "Burger Promo", "Fries Campaign", "Breakfast Offer", "General Brand Talk"]
 
-    if "platform" not in df.columns:
-        df["platform"] = random.choices(platforms, k=len(df))
+    df["platform"] = random.choices(platforms, k=len(df))
+    df["campaign"] = random.choices(campaigns, k=len(df))
 
-    if "category" not in df.columns:
-        def detect_category(text):
-            text = text.lower()
-            if any(w in text for w in ["fries", "burger", "food", "taste", "cold", "meal"]):
-                return "Food Quality"
-            if any(w in text for w in ["staff", "service", "rude", "friendly"]):
-                return "Service"
-            if any(w in text for w in ["price", "expensive", "cheap", "cost"]):
-                return "Price"
-            if any(w in text for w in ["clean", "dirty", "hygiene"]):
-                return "Cleanliness"
-            if any(w in text for w in ["wait", "slow", "fast", "queue"]):
-                return "Waiting Time"
-            return random.choice(categories)
+    def detect_category(text):
+        text = text.lower()
+        if any(w in text for w in ["burger", "fries", "food", "meal", "taste", "cold"]):
+            return "Food Quality"
+        if any(w in text for w in ["staff", "service", "rude", "friendly"]):
+            return "Service"
+        if any(w in text for w in ["price", "expensive", "cheap", "cost"]):
+            return "Price"
+        if any(w in text for w in ["clean", "dirty", "hygiene"]):
+            return "Cleanliness"
+        if any(w in text for w in ["wait", "slow", "fast", "queue"]):
+            return "Waiting Time"
+        return random.choice(["Food Quality", "Service", "Price", "Cleanliness", "Waiting Time"])
 
-        df["category"] = df["text"].apply(detect_category)
+    df["category"] = df["text"].apply(detect_category)
 
-    if "campaign" not in df.columns:
-        df["campaign"] = random.choices(campaigns, k=len(df))
-
-    if "location" not in df.columns:
-        store_cols = ["store_address", "address", "city"]
-        store_col = next((col for col in store_cols if col in df.columns), None)
-        if store_col:
-            df["location"] = df[store_col].astype(str).str[:22]
-        else:
-            df["location"] = random.choices(locations, k=len(df))
-
-    if "date" not in df.columns:
-        today = datetime.today()
-        df["date"] = [today - timedelta(days=random.randint(0, 90)) for _ in range(len(df))]
+    if "store_address" in df.columns:
+        df["location"] = df["store_address"].astype(str).str[:24]
+    elif "address" in df.columns:
+        df["location"] = df["address"].astype(str).str[:24]
     else:
-        df["date"] = pd.to_datetime(df["date"], errors="coerce")
-        df["date"] = df["date"].fillna(pd.Timestamp.today())
+        df["location"] = random.choices(locations, k=len(df))
 
-    df["likes"] = [random.randint(10, 4000) for _ in range(len(df))]
-    df["shares"] = [random.randint(1, 700) for _ in range(len(df))]
-    df["comments"] = [random.randint(0, 350) for _ in range(len(df))]
-    df["reach"] = df["likes"] * random.randint(5, 20) + df["shares"] * random.randint(10, 40)
-    df["engagement"] = df["likes"] + df["shares"] + df["comments"]
+    today = datetime.today()
+    df["date"] = [today - timedelta(days=random.randint(0, 90)) for _ in range(len(df))]
+
+    df["likes"] = [random.randint(20, 5000) for _ in range(len(df))]
+    df["shares"] = [random.randint(1, 900) for _ in range(len(df))]
+    df["comments_count"] = [random.randint(0, 500) for _ in range(len(df))]
+    df["reach"] = df["likes"] * 12 + df["shares"] * 35
+    df["engagement"] = df["likes"] + df["shares"] + df["comments_count"]
 
     return df
 
 
 df = load_data()
 
-# ---------------- SIDEBAR ----------------
-st.sidebar.markdown('<div class="sidebar-title">🍟 McDonald’s BI</div>', unsafe_allow_html=True)
+# ---------------- SIDEBAR NAVIGATION ----------------
+st.sidebar.markdown('<div class="sidebar-logo">🍟 McDonald’s BI</div>', unsafe_allow_html=True)
 
-st.sidebar.markdown('<div class="nav-box">📊 Overview</div>', unsafe_allow_html=True)
-st.sidebar.markdown('<div class="nav-box">💬 Mentions</div>', unsafe_allow_html=True)
-st.sidebar.markdown('<div class="nav-box">📈 Trends</div>', unsafe_allow_html=True)
-st.sidebar.markdown('<div class="nav-box">🌍 Platforms</div>', unsafe_allow_html=True)
-st.sidebar.markdown('<div class="nav-box">⚙️ Filters</div>', unsafe_allow_html=True)
+page = st.sidebar.radio(
+    "Navigation",
+    [
+        "📊 Overview",
+        "💬 Mentions",
+        "📈 Trends",
+        "🌍 Platforms",
+        "🔍 Analyzer"
+    ],
+    label_visibility="collapsed"
+)
 
-st.sidebar.markdown("---")
+st.sidebar.markdown("<hr>", unsafe_allow_html=True)
+st.sidebar.markdown("### ⚙️ Filters")
 
 sentiment_filter = st.sidebar.multiselect(
     "Sentiment",
-    options=sorted(df["sentiment"].unique()),
+    sorted(df["sentiment"].unique()),
     default=sorted(df["sentiment"].unique())
 )
 
 platform_filter = st.sidebar.multiselect(
     "Platform",
-    options=sorted(df["platform"].unique()),
+    sorted(df["platform"].unique()),
     default=sorted(df["platform"].unique())
 )
 
 category_filter = st.sidebar.multiselect(
     "Category",
-    options=sorted(df["category"].unique()),
+    sorted(df["category"].unique()),
     default=sorted(df["category"].unique())
 )
 
@@ -284,231 +316,282 @@ df_filtered = df[
     (df["category"].isin(category_filter))
 ]
 
-# ---------------- HEADER ----------------
-st.markdown("""
-<div class="main-header">
-    <div class="title">McDonald’s Social Media Sentiment Analysis Dashboard</div>
-    <div class="subtitle">
-        Power BI-style social listening dashboard for customer reviews, sentiment, engagement, campaign performance, and brand reputation.
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# ---------------- KPI CARDS ----------------
-total_mentions = len(df_filtered)
-positive = (df_filtered["sentiment"] == "positive").sum()
-negative = (df_filtered["sentiment"] == "negative").sum()
-neutral = (df_filtered["sentiment"] == "neutral").sum()
-
-positive_pct = round((positive / total_mentions) * 100, 1) if total_mentions else 0
-negative_pct = round((negative / total_mentions) * 100, 1) if total_mentions else 0
-brand_health = round(((positive - negative) / total_mentions) * 100, 1) if total_mentions else 0
-total_reach = int(df_filtered["reach"].sum()) if total_mentions else 0
-total_engagement = int(df_filtered["engagement"].sum()) if total_mentions else 0
-
-k1, k2, k3, k4, k5 = st.columns(5)
-
-with k1:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">TOTAL MENTIONS</div>
-        <div class="kpi-value">{total_mentions:,}</div>
-        <div class="kpi-delta">Live review volume</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with k2:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">SOCIAL REACH</div>
-        <div class="kpi-value">{total_reach/1000000:.1f}M</div>
-        <div class="kpi-delta">Estimated reach</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with k3:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">ENGAGEMENT</div>
-        <div class="kpi-value">{total_engagement/1000:.1f}K</div>
-        <div class="kpi-delta">Likes + shares + comments</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with k4:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">POSITIVE RATE</div>
-        <div class="kpi-value">{positive_pct}%</div>
-        <div class="kpi-delta">Customer satisfaction</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with k5:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">BRAND HEALTH</div>
-        <div class="kpi-value">{brand_health}</div>
-        <div class="kpi-delta">Positive minus negative index</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.write("")
-
-# ---------------- CHART STYLE FUNCTION ----------------
+# ---------------- CHART STYLE ----------------
 def style_chart(fig):
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#07111d",
         font_color="white",
         title_font_color="#00f5ff",
-        title_font_size=18,
-        margin=dict(l=20, r=20, t=50, b=20),
-        legend=dict(
-            bgcolor="rgba(0,0,0,0)",
-            font=dict(color="white")
-        )
+        title_font_size=20,
+        margin=dict(l=20, r=20, t=55, b=25),
+        legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color="white")),
     )
-    fig.update_xaxes(gridcolor="#14303d")
-    fig.update_yaxes(gridcolor="#14303d")
+    fig.update_xaxes(gridcolor="#12313d", zerolinecolor="#12313d")
+    fig.update_yaxes(gridcolor="#12313d", zerolinecolor="#12313d")
     return fig
 
-# ---------------- ROW 1 CHARTS ----------------
-c1, c2, c3 = st.columns([1.1, 1.2, 1.2])
+# ---------------- HEADER ----------------
+st.markdown("""
+<div class="main-card">
+    <div class="title">McDonald’s Social Media Sentiment Intelligence</div>
+    <div class="subtitle">
+        Premium Power BI-style analytics for McDonald's reviews, customer sentiment, platforms, engagement and brand health.
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-with c1:
+# ---------------- KPI FUNCTION ----------------
+def render_kpis(data):
+    total = len(data)
+    positive = (data["sentiment"] == "positive").sum()
+    negative = (data["sentiment"] == "negative").sum()
+    positive_pct = round((positive / total) * 100, 1) if total else 0
+    negative_pct = round((negative / total) * 100, 1) if total else 0
+    brand_health = round(((positive - negative) / total) * 100, 1) if total else 0
+    reach = int(data["reach"].sum()) if total else 0
+    engagement = int(data["engagement"].sum()) if total else 0
+
+    cols = st.columns(5)
+    kpis = [
+        ("TOTAL MENTIONS", f"{total:,}", "Live review volume"),
+        ("SOCIAL REACH", f"{reach/1_000_000:.1f}M", "Estimated brand reach"),
+        ("ENGAGEMENT", f"{engagement/1000:.1f}K", "Likes + shares + comments"),
+        ("POSITIVE RATE", f"{positive_pct}%", "Customer satisfaction"),
+        ("BRAND HEALTH", f"{brand_health}", "Positive minus negative")
+    ]
+
+    for col, item in zip(cols, kpis):
+        with col:
+            st.markdown(f"""
+            <div class="kpi">
+                <div class="kpi-label">{item[0]}</div>
+                <div class="kpi-value">{item[1]}</div>
+                <div class="kpi-note">{item[2]}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+# ---------------- OVERVIEW PAGE ----------------
+if page == "📊 Overview":
+    render_kpis(df_filtered)
+    st.write("")
+
+    c1, c2 = st.columns([1, 1])
+
+    with c1:
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        fig = px.pie(
+            df_filtered,
+            names="sentiment",
+            title="Sentiment Health Ring",
+            hole=0.65,
+            color="sentiment",
+            color_discrete_map={
+                "positive": "#00ff88",
+                "neutral": "#00f5ff",
+                "negative": "#ff3b5c"
+            }
+        )
+        fig.update_traces(textinfo="percent+label", pull=[0.04, 0.02, 0.04])
+        st.plotly_chart(style_chart(fig), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with c2:
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        cat = df_filtered.groupby(["category", "sentiment"]).size().reset_index(name="mentions")
+        fig = px.bar(
+            cat,
+            x="category",
+            y="mentions",
+            color="sentiment",
+            title="Category-wise Sentiment Breakdown",
+            color_discrete_map={
+                "positive": "#00ff88",
+                "neutral": "#00f5ff",
+                "negative": "#ff3b5c"
+            }
+        )
+        st.plotly_chart(style_chart(fig), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
     st.markdown('<div class="panel">', unsafe_allow_html=True)
-    sentiment_fig = px.pie(
-        df_filtered,
-        names="sentiment",
-        title="Sentiment Share",
-        hole=0.55
-    )
-    sentiment_fig.update_traces(textposition="inside", textinfo="percent+label")
-    st.plotly_chart(style_chart(sentiment_fig), use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with c2:
-    st.markdown('<div class="panel">', unsafe_allow_html=True)
-    platform_df = df_filtered["platform"].value_counts().reset_index()
-    platform_df.columns = ["platform", "mentions"]
-    platform_fig = px.bar(
-        platform_df,
-        x="platform",
-        y="mentions",
-        title="Mentions by Platform",
-        text="mentions"
-    )
-    st.plotly_chart(style_chart(platform_fig), use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with c3:
-    st.markdown('<div class="panel">', unsafe_allow_html=True)
-    category_df = df_filtered["category"].value_counts().reset_index()
-    category_df.columns = ["category", "mentions"]
-    category_fig = px.bar(
-        category_df,
-        x="mentions",
-        y="category",
-        orientation="h",
-        title="Conversation Categories",
-        text="mentions"
-    )
-    st.plotly_chart(style_chart(category_fig), use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ---------------- ROW 2 CHARTS ----------------
-r1, r2 = st.columns(2)
-
-with r1:
-    st.markdown('<div class="panel">', unsafe_allow_html=True)
-    trend = df_filtered.groupby(df_filtered["date"].dt.date).agg(
-        average_sentiment=("score", "mean"),
+    daily = df_filtered.groupby(df_filtered["date"].dt.date).agg(
+        sentiment_score=("score", "mean"),
         mentions=("text", "count")
     ).reset_index()
 
-    trend_fig = px.line(
-        trend,
+    fig = px.area(
+        daily,
         x="date",
-        y="average_sentiment",
-        markers=True,
-        title="Sentiment Trend Over Time"
+        y="mentions",
+        title="Daily Mention Volume",
+        markers=True
     )
-    st.plotly_chart(style_chart(trend_fig), use_container_width=True)
+    fig.update_traces(line_color="#00f5ff", fillcolor="rgba(0,245,255,0.25)")
+    st.plotly_chart(style_chart(fig), use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-with r2:
-    st.markdown('<div class="panel">', unsafe_allow_html=True)
-    engagement = df_filtered.groupby("platform")["engagement"].sum().reset_index()
-    engagement_fig = px.area(
-        engagement,
-        x="platform",
-        y="engagement",
-        title="Engagement by Platform"
-    )
-    st.plotly_chart(style_chart(engagement_fig), use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ---------------- ROW 3 ----------------
-left, right = st.columns([1.4, 1])
-
-with left:
-    st.markdown('<div class="panel">', unsafe_allow_html=True)
+# ---------------- MENTIONS PAGE ----------------
+elif page == "💬 Mentions":
     st.markdown('<div class="section-title">Recent Customer Mentions</div>', unsafe_allow_html=True)
-    show_cols = ["date", "platform", "location", "category", "text", "sentiment", "rating_clean", "engagement"]
-    st.dataframe(df_filtered[show_cols].head(25), use_container_width=True, height=420)
-    st.markdown('</div>', unsafe_allow_html=True)
 
-with right:
+    top_mentions = df_filtered.sort_values("date", ascending=False).head(18)
+
+    for _, row in top_mentions.iterrows():
+        sentiment_color = {
+            "positive": "#00ff88",
+            "neutral": "#00f5ff",
+            "negative": "#ff3b5c"
+        }.get(row["sentiment"], "#00f5ff")
+
+        st.markdown(f"""
+        <div class="mention-card" style="border-left-color:{sentiment_color};">
+            <div class="mention-text">“{str(row['text'])[:240]}”</div>
+            <div class="mention-meta">
+                {row['date'].strftime('%d %b %Y')} • {row['platform']} • {row['category']} • {row['location']} • Sentiment: <b>{row['sentiment']}</b> • Engagement: {row['engagement']:,}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+# ---------------- TRENDS PAGE ----------------
+elif page == "📈 Trends":
+    c1, c2 = st.columns(2)
+
+    trend = df_filtered.groupby(df_filtered["date"].dt.date).agg(
+        average_sentiment=("score", "mean"),
+        mentions=("text", "count"),
+        engagement=("engagement", "sum")
+    ).reset_index()
+
+    with c1:
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        fig = px.line(
+            trend,
+            x="date",
+            y="average_sentiment",
+            title="Sentiment Score Trend",
+            markers=True
+        )
+        fig.update_traces(line_color="#00ff88", line_width=3)
+        st.plotly_chart(style_chart(fig), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with c2:
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        fig = px.area(
+            trend,
+            x="date",
+            y="engagement",
+            title="Engagement Trend",
+            markers=True
+        )
+        fig.update_traces(line_color="#00f5ff", fillcolor="rgba(0,245,255,0.28)")
+        st.plotly_chart(style_chart(fig), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
     st.markdown('<div class="panel">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">AI Business Insights</div>', unsafe_allow_html=True)
-
-    top_category = df_filtered["category"].value_counts().idxmax() if total_mentions else "N/A"
-    top_platform = df_filtered["platform"].value_counts().idxmax() if total_mentions else "N/A"
-
-    if brand_health > 20:
-        health_msg = "Brand sentiment is strong. Positive customer perception is leading negative feedback."
-    elif brand_health < -10:
-        health_msg = "Brand sentiment needs attention. Negative mentions are creating reputation risk."
-    else:
-        health_msg = "Brand sentiment is balanced. Monitor complaint categories closely."
-
-    st.markdown(f'<div class="insight-box">✅ Top conversation area: <b>{top_category}</b></div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="insight-box">📡 Highest activity platform: <b>{top_platform}</b></div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="insight-box">📊 Negative rate: <b>{negative_pct}%</b></div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="insight-box">🧠 {health_msg}</div>', unsafe_allow_html=True)
+    heat = df_filtered.groupby(["platform", "sentiment"]).size().reset_index(name="count")
+    fig = px.density_heatmap(
+        heat,
+        x="sentiment",
+        y="platform",
+        z="count",
+        title="Platform vs Sentiment Heatmap",
+        color_continuous_scale="Teal"
+    )
+    st.plotly_chart(style_chart(fig), use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ---------------- LIVE PREDICTION ----------------
-st.markdown('<div class="panel">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Analyze New McDonald’s Comment</div>', unsafe_allow_html=True)
+# ---------------- PLATFORMS PAGE ----------------
+elif page == "🌍 Platforms":
+    c1, c2 = st.columns(2)
 
-user_text = st.text_area("Enter a customer review or social media comment:")
+    platform_data = df_filtered.groupby("platform").agg(
+        mentions=("text", "count"),
+        engagement=("engagement", "sum"),
+        reach=("reach", "sum")
+    ).reset_index()
 
-if st.button("Analyze Sentiment"):
-    if user_text.strip() == "":
-        st.warning("Please enter a comment first.")
-    else:
-        # Simple rule-based fallback based on rating-style sentiment words
-        positive_words = ["good", "great", "love", "amazing", "excellent", "fast", "fresh", "clean", "tasty", "friendly"]
-        negative_words = ["bad", "worst", "hate", "slow", "dirty", "cold", "rude", "expensive", "terrible", "poor"]
+    with c1:
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        fig = px.bar(
+            platform_data,
+            x="platform",
+            y="mentions",
+            title="Mentions by Platform",
+            text="mentions"
+        )
+        fig.update_traces(marker_color="#00f5ff")
+        st.plotly_chart(style_chart(fig), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        text_lower = user_text.lower()
-        pos_hits = sum(word in text_lower for word in positive_words)
-        neg_hits = sum(word in text_lower for word in negative_words)
+    with c2:
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        fig = px.scatter(
+            platform_data,
+            x="reach",
+            y="engagement",
+            size="mentions",
+            color="platform",
+            title="Reach vs Engagement by Platform",
+            size_max=55
+        )
+        st.plotly_chart(style_chart(fig), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        if pos_hits > neg_hits:
-            prediction = "positive"
-        elif neg_hits > pos_hits:
-            prediction = "negative"
-        else:
-            prediction = "neutral"
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Platform Performance Table</div>', unsafe_allow_html=True)
+    st.dataframe(platform_data, use_container_width=True, height=330)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-        if prediction == "positive":
-            st.success("😊 Predicted Sentiment: Positive")
-        elif prediction == "negative":
-            st.error("😡 Predicted Sentiment: Negative")
-        else:
-            st.warning("😐 Predicted Sentiment: Neutral")
+# ---------------- ANALYZER PAGE ----------------
+elif page == "🔍 Analyzer":
+    left, right = st.columns([1.2, 1])
 
-st.markdown('</div>', unsafe_allow_html=True)
+    with left:
+        st.markdown('<div class="analyzer-box">', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Analyze New McDonald’s Comment</div>', unsafe_allow_html=True)
+
+        user_text = st.text_area(
+            "Enter a customer review, tweet, or social media comment:",
+            height=170,
+            placeholder="Example: The fries were fresh but the service was slow..."
+        )
+
+        if st.button("Analyze Sentiment"):
+            if user_text.strip() == "":
+                st.warning("Please enter a comment first.")
+            else:
+                text = user_text.lower()
+                positive_words = ["good", "great", "love", "amazing", "excellent", "fast", "fresh", "clean", "tasty", "friendly", "best"]
+                negative_words = ["bad", "worst", "hate", "slow", "dirty", "cold", "rude", "expensive", "terrible", "poor", "late"]
+
+                pos_hits = sum(w in text for w in positive_words)
+                neg_hits = sum(w in text for w in negative_words)
+
+                if pos_hits > neg_hits:
+                    st.success("😊 Positive Sentiment Detected")
+                    st.markdown("**Business meaning:** Customer feedback indicates satisfaction. This can support brand reputation and campaign performance.")
+                elif neg_hits > pos_hits:
+                    st.error("😡 Negative Sentiment Detected")
+                    st.markdown("**Business meaning:** Feedback signals complaint risk. Operations team should review service, price, or quality issues.")
+                else:
+                    st.warning("😐 Neutral Sentiment Detected")
+                    st.markdown("**Business meaning:** Customer emotion is balanced. Monitor for recurring patterns.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with right:
+        total = len(df_filtered)
+        positive = (df_filtered["sentiment"] == "positive").sum()
+        negative = (df_filtered["sentiment"] == "negative").sum()
+        top_category = df_filtered["category"].value_counts().idxmax() if total else "N/A"
+        top_platform = df_filtered["platform"].value_counts().idxmax() if total else "N/A"
+        neg_rate = round((negative / total) * 100, 1) if total else 0
+
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">AI Business Insight Board</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="insight">✅ Top issue/category: <b>{top_category}</b></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="insight">📡 Most active platform: <b>{top_platform}</b></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="insight">⚠️ Negative feedback rate: <b>{neg_rate}%</b></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="insight">📌 Recommended action: Track negative reviews around service speed, food quality, and pricing.</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
